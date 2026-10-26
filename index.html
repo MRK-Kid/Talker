@@ -386,7 +386,7 @@ function renderMessages(){
     const welcome=document.createElement("div");
     welcome.className="welcome";
     const h=document.createElement("h1");
-    h.textContent("Welcome to #"+channel.name);
+    h.textContent = "Welcome to #" + channel.name;
     const p=document.createElement("p");
     p.textContent="This is the beginning of this channel. Send a message!";
     welcome.append(h,p);
