@@ -172,7 +172,10 @@ input{outline:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-
+const supabaseClient = window.supabase.createClient(
+  "https://jzmytquuzdcwpoxuwkkr.supabase.co",
+  "sb_publishable_yZW4WRtRb-9LGVN65riM8g_JqgiLH-Z"
+);
 const $ = id => document.getElementById(id);
 const STORAGE_KEY = "talkersAppV3";
 
