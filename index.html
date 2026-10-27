@@ -178,7 +178,60 @@ const supabaseClient = window.supabase.createClient(
 );
 const $ = id => document.getElementById(id);
 const STORAGE_KEY = "talkersAppV3";
+let liveChat = null;
 
+function connectLiveChat() {
+  liveChat = supabaseClient.channel("talkers-shared-room", {
+    config: {
+      private: false,
+      broadcast: { self: false }
+    }
+  });
+
+  liveChat.on("broadcast", { event: "talker-message" }, ({ payload }) => {
+    if (!payload || !payload.id || typeof payload.text !== "string") return;
+
+    let server = data.servers.find(s => s.name === payload.serverName);
+
+    if (!server) {
+      server = {
+        id: uid(),
+        name: cleanName(payload.serverName) || "My Server",
+        channels: []
+      };
+      data.servers.push(server);
+    }
+
+    let channel = server.channels.find(c => c.name === payload.channelName);
+
+    if (!channel) {
+      channel = {
+        id: uid(),
+        name: cleanName(payload.channelName, 30) || "general",
+        messages: []
+      };
+      server.channels.push(channel);
+    }
+
+    if (channel.messages.some(m => m.id === payload.id)) return;
+
+    channel.messages.push({
+      ...payload,
+      owner: "remote"
+    });
+
+    if (channel.messages.length > 500) channel.messages.shift();
+
+    saveData();
+    renderAll();
+  });
+
+  liveChat.subscribe(status => {
+    if (status === "SUBSCRIBED") {
+      console.log("Talkers live chat connected!");
+    }
+  });
+}
 function uid(){
   return Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 }
