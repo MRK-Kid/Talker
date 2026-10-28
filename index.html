@@ -625,7 +625,61 @@ $("deleteChannel").addEventListener("click",()=>{
   if(channel)removeChannel(channel);
 });
 
-$("chatForm").addEventListener("submit",event=>{
+$("chatForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const text = $("messageInput").value.trim();
+  const channel = activeChannel();
+  const server = activeServer();
+
+  if (!text || !channel || !server) return;
+
+  const message = {
+    id: uid(),
+    serverName: server.name,
+    channelName: channel.name,
+    name: data.profile.name,
+    color: data.profile.color,
+    picture: data.profile.picture,
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+    text,
+    edited: false,
+    owner: "local"
+  };
+
+  channel.messages.push(message);
+
+  if (!saveData()) {
+    channel.messages.pop();
+    return;
+  }
+
+  $("messageInput").value = "";
+  renderMessages();
+
+  if (!liveChat) {
+    alert("Live chat is not connected yet. Refresh and try again.");
+    return;
+  }
+
+  try {
+    const result = await liveChat.send({
+      type: "broadcast",
+      event: "talker-message",
+      payload: message
+    });
+
+    if (result !== "ok") {
+      alert("The message wasn't shared. Check the connection.");
+    }
+  } catch (error) {
+    console.error("Talkers send error:", error);
+    alert("Couldn't share the message. Please refresh and try again.");
+  }
+});
   event.preventDefault();
   const text=$("messageInput").value.trim();
   const channel=activeChannel();
