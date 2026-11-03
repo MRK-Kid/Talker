@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,7 +168,6 @@ input{outline:none}
   </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supabaseClient = window.supabase.createClient(
@@ -232,6 +230,7 @@ function connectLiveChat() {
     }
   });
 }
+
 function uid(){
   return Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 }
@@ -679,31 +678,6 @@ $("chatForm").addEventListener("submit", async event => {
     console.error("Talkers send error:", error);
     alert("Couldn't share the message. Please refresh and try again.");
   }
-});
-  event.preventDefault();
-  const text=$("messageInput").value.trim();
-  const channel=activeChannel();
-  if(!text||!channel)return;
-
-  const message={
-    id:uid(),
-    name:data.profile.name,
-    color:data.profile.color,
-    picture:data.profile.picture,
-    time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
-    text,
-    edited:false,
-    owner:"local"
-  };
-
-  channel.messages.push(message);
-  if(!saveData()){
-    channel.messages.pop();
-    return;
-  }
-
-  $("messageInput").value="";
-  renderMessages();
 });
 
 function editMessage(channel,message){
